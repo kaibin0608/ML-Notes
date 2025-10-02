@@ -1,8 +1,8 @@
 from time import sleep
 from apscheduler.schedulers.background import BackgroundScheduler, BlockingScheduler
 
-def display(msg):
-    print("Message:",msg)
+def display():
+    print("Message:")
     # print("This function has beed executed")
     # job_id.remove() # remove the job after execution
     # scheduler.shutdown(wait = False) # wait = false to shutdown immediately
@@ -11,8 +11,9 @@ def display(msg):
 # Initialize the rest of the application here, or before the scheduler initialization
 scheduler = BlockingScheduler()
 # job_id = scheduler.add_job(display, 'interval', seconds=5)
-scheduler.add_job(display, 'job 1', seconds=5)
-scheduler.add_job(display, 'job 2', seconds=3)
+scheduler.add_job(display, 'interval', seconds=1, args=['job 0'])
+# scheduler.add_job(display, 'interval', seconds=5, args=['job 1'])
+
 
 scheduler.start()
-print("Hello World")
+# print("Hello World")
