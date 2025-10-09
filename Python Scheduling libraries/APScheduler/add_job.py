@@ -5,6 +5,7 @@ import time
 from datetime import datetime
 from dotenv import load_dotenv
 import os
+from jobs import persistent_job,initialize_scheduler,volatile_job
 
 # Define your PostgreSQL connection string
 # Replace 'user', 'password', 'host', 'port', and 'database' with your actual details
@@ -23,24 +24,10 @@ DATABASE_URL =f"postgresql+psycopg2://{user}:{password}@{host}:{port}/{name}"
 # Configure job stores
 jobstores = {
     'default': MemoryJobStore(),
-    'persistent':SQLAlchemyJobStore(url=DATABASE_URL) 
-}
-
-def initialize_scheduler():
-    # Initialize the scheduler with the configured job stores
-    scheduler = BackgroundScheduler(jobstores=jobstores)
-    # Start the scheduler
-    scheduler.start()
-    return scheduler
-
-def volatile_job():
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Volatile job (in-memory)")
-
-def persistent_job():
-    print(f"[{datetime.now().strftime('%H:%M:%S')}] Persistent job (in SQLite)")
+    'persistent':SQLAlchemyJobStore(url=DATABASE_URL) }
 
 # Initialize scheduler with our job stores
-scheduler = initialize_scheduler()
+scheduler = initialize_scheduler(jobstores)
 
 # Check if persistent job already exists (after restart)
 existing_job = scheduler.get_job('persistent_job', jobstore='persistent')

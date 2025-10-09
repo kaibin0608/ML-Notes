@@ -1,12 +1,11 @@
-from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.jobstores.sqlalchemy import SQLAlchemyJobStore
 from apscheduler.jobstores.memory import MemoryJobStore
 from apscheduler.jobstores.base import JobLookupError
-from datetime import datetime
-import time
+from jobs import persistent_job,initialize_scheduler
+
 from dotenv import load_dotenv
 import os
-from jobs import persistent_job,initialize_scheduler,volatile_job
+import time
 
 # Define your PostgreSQL connection string
 # Replace 'user', 'password', 'host', 'port', and 'database' with your actual details
@@ -25,20 +24,13 @@ jobstores = {
     "persistent": SQLAlchemyJobStore(url=DATABASE_URL),
 }
 
-scheduler = initialize_scheduler(jobstores)
-# --- Act: remove job by ID (doesn't require loading the function) ---
-try:
-    scheduler.remove_job("persistent_job", jobstore="persistent")
-    print("✓ Removed job 'persistent_job' from 'persistent' store.")
-except JobLookupError:
-    print("✗ Job 'persistent_job' not found in database.")
+scheduler = initialize_scheduler(jobstores=jobstores)
 
-# --- Verify removal ---
 try:
-    job = scheduler.get_job("persistent_job", jobstore="persistent")
-    print("Still exists?", bool(job))
-except:
-    print("✓ Confirmed: Job no longer exists in database.")
+    scheduler.resume_job("persistent_job", jobstore="persistent")
+    print("Resumed")
+except JobLookupError:
+    print("Not found")
 
 print("Press Ctrl+C to exit.")
 try:
