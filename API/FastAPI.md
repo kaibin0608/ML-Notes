@@ -327,3 +327,21 @@ class DbReview(BaseModel):
 ### Handling a PUT Operation
 
 PUT endpoint to update an existing movie review:
+- Endpoint:`/reviews`
+- Input:`DbReview`(from previous slide)
+- Output: `DbReview`
+
+```python
+@app.put("/reviews",response_model=DbReview)
+def update_erview(review:DbReview):
+    #update the movie review in the database
+    db_review = crud.update_review(review)
+    # return the updated review
+    return db_review
+```
+
+### Handling a DELETE Operation
+
+DELETE endpoint to remove an existing movie review:
+- Endpoint: `/reviews`
+- Input: `DbReview`
