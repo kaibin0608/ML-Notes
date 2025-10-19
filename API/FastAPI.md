@@ -23,7 +23,7 @@ The key parts of a GET reqeust are:
 - Query String,e.g.`?q=fastapi`,This tells the handler that we are sending a query parameter named "q" with a value of "fastapi."
 - All this put together tells our browser to search Google for the term "fastapi" which will show us the FastAPI project documentation.
 
- ### FastAPI GT operation
+ ### FastAPI GET operation
 
  The simplest FastAPI application:
 
@@ -112,7 +112,7 @@ curl \
 **GET Operations**
 - Traditional use of: request information about an object. 
 - Request parameters sent via query string
-- Can be sent from a web browser
+- Can be sent from a web browser ( means you can trigger it with no extra code/ tools, just use the browser UI(address bar, a link, or a plain HTML form))
 
 ```python
 api = "http://moviereviews.co/reviews/1"
@@ -123,12 +123,37 @@ response = requests.get(api)
 - Traditional use: create a new object. 
 - Parameters sent via query string as well as request body.(The important thing to remember for now is that POST requests can send much more information to the server than GET requests can)
 - Requires an application or framework
+    - You need code (JS, curl, Postman, Python, etc.) because the request needs things a “bare” browser submit can’t do conveniently:
+        - Custom headers / tokens (e.g., Authorization: Bearer …, X-API-KEY)
+        - JSON body (not a simple form)
+        - Non-standard methods (PUT/PATCH/DELETE)
+        - Complex content types (e.g., application/json, application/xml)
+        - CORS/CSRF constraints (server refuses generic browser origins or needs a CSRF header)
     - eg. `cURL`,`requests`
 
+Example of an application/client script
 ```python 
 api = "http://moviereview.co/reviews/"
 body = {"text":"A great movie!"}
 response= requests.post(api,json = body)
+```
+
+Same call in other "requires code"cilents: 
+```bash
+# curl
+curl -X POST http://moviereview.co/reviews/ \
+  -H "Content-Type: application/json" \
+  -d '{"text":"A great movie!"}'
+```
+
+Examples : 
+```bash
+// Browser JS (or axios/fetch); can’t do this with a raw HTML form
+fetch('/api/orders', {
+  method: 'POST',
+  headers: {'Content-Type':'application/json','Authorization':'Bearer <token>'},
+  body: JSON.stringify({sku:'ABC123', qty:2})
+})
 ```
 
 ### HTTP Request Body
@@ -235,3 +260,70 @@ curl -X POST \
   -d '{"name": "bananas"}' \
   http://localhost:8000
 ```
+Answer:
+```python
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+# Define model Item
+class Item(BaseModel):
+    name: str
+
+app = FastAPI()
+
+
+@app.post("/")
+def root(item: Item):
+    name = item.name
+    return {"message": f"We have {name}"}
+```
+
+# FastAPI Advanced topics
+
+We’ll start by learning how to support PUT and DELETE operations using FastAPI. Then we will learn how to handle different kinds of errors and always return an appropriate status code in the response. Lastly we'll learn how to use async to enable concurrent requests that can handle higher workloads.
+
+## PUT and DELETE operation
+
+**PUT Operations**
+- Traditional use: update an existing object
+- Paramters sent via query string as well as request body
+- Requires an application or framework
+    - eg. `cURL`,`requests`
+```python
+api = "http://moviereviews.co/reviews/1"
+body = {"text":"A fantastuc movie!"}
+response = requests.put(api.json=body)
+```
+
+**DELETE Operations**
+- Traditional use: delete an existing object
+- Parameters sent via query string as well as request body
+- requires an application or framework
+    - eg.`cURL`, `requests`
+
+```
+api = "http://moviereviews.co/reviews/1"
+response = requests.delete(api)
+```
+
+### Referencing Existing 
+- No ORM, so app must map object to ID
+- Database ID - unique identifier
+- _id convention for database IDs
+    - review_id: Table reviews, column id
+    - Same convention in frameworks with ORM
+
+```python    
+from pydantic import BaseModel
+
+class DbReview(BaseModel):
+        movie: str
+        num_stars: int    
+        text: str
+        # Reference database ID of Reviews   
+        review_id: int
+```
+
+### Handling a PUT Operation
+
+PUT endpoint to update an existing movie review:
