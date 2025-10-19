@@ -188,4 +188,50 @@ def create_review(review:MovieReview):
     # Return the review including database ID
     return db_view
 ```
-Now let's make a POST endpoint to create a new movie review. The endpoint is called "reviews." We use the @app.post annotation to tell FastAPI that this is a POST operation. We follow it with a function create_review that defines the input and output. The input is the pydantic model for MovieReview objects that we defined in the previous slide. The output schema is called DbReview. Typically we would define a file call crud.py with custom functions to create, read, update, and delete objects in the database. You can see an example of this in the FastAPI docs below. We can then import and use these within our `create_review` function as we are here.
+
+Explanation:
+- The endpoint is called "reviews."
+- We use the @app.post annotation to tell FastAPI that this is a POST operation. 
+- We follow it with a function create_review that defines the input and output. 
+- The input is the pydantic model for MovieReview objects that we defined in the previous slide. 
+- The output schema is called DbReview.
+- Typically we would define a file call crud.py with custom functions to create, read, update, and delete objects in the database. 
+- You can see an example of this in the FastAPI docs below. We can then import and use these within our `create_review` function as we are here.
+- https://fastapi.tiangolo.com/tutorial/sql-databases/#crud-utils
+
+#### 1. Pydantic model
+You've been asked to create an API endpoint that manages items in inventory. To get started, create a Pydantic model for Items that has attributes name, quantity, and expiration.
+
+- Import date from datetime and BaseModel from pydantic.
+- Create a Pydantic model for Item.
+- Fill in the following fields correctly: name (string), quantity (integer, optional, default 0), and expiration (date, optional, default None).
+
+```python
+# Import date
+from datetime import date
+
+# Import BaseModel
+from pydantic import BaseModel
+
+# Define model Item
+class Item(BaseModel):
+    name: str
+    quantity: int = 0
+    expiration: date = None
+```
+
+#### 2. POST operation in action
+You've been asked to create an API endpoint that accepts a name parameter and returns a message saying "We have name". To accomplish this, create a Pydantic model for Item and root endpoint (/) that serves HTTP POST operations. The endpoint should accept the Item model as input and respond with a message including Item.name.
+
+You can't run the FastAPI server directly with "Run this file" - see the instructions for how to run the server and test your code from the terminal.
+
+- Define pydantic model Item so that parameter name can be passed into the POST body.
+- Run the live server in the terminal: fastapi dev main.py
+- Open a new terminal (top-right of terminal) and test your code with the following command:
+
+```bash
+curl -X POST \
+  -H 'Content-Type: application/json' \
+  -d '{"name": "bananas"}' \
+  http://localhost:8000
+```
