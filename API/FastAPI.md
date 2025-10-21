@@ -786,6 +786,7 @@ def test_main():
     response = main()
     assert response == {"msg":"Hello"}
 ```
+- the unit test can validate the dictionary it returns
 
 **System Tests**
 - Focus: Isolated system operations
@@ -799,8 +800,12 @@ def test_read_main():
     assert response.status_code ==200
     assert response.json() == {"msg":"Hello"}
 ```
+- the system test can call the actual endpoint, validate the status of the response, and validate that the JSON response parses into the same dictionary
 
 ### Using TestClient
+FastAPI lets us write automated system tests just like unit tests 
+ - to enable this, the TestClient class lets pyteset call the running API and validate its responses.
+ - In out system test, we can import TestClient from fastapi.testclient and import our app from main.py
 
 `TestClient`: HTTP client for `pytest`
 
@@ -820,6 +825,9 @@ def test_main():
 
 ### Testing Error or Failure Responses
 
+How do we test roor or failure responses from our app with system tests? 
+- Unlike unit tests, where we would have to catch an exception, FastAPI system tests let us test error or failure responses just like success responses, by validating the HTTP status code and response body
+
 **App**
 ```python 
 app = FastAPI()
@@ -828,7 +836,7 @@ app = FastAPI()
 def delete_item(item:Item):
     if item.id not in item_ids:
         raise HTTPEXception(
-            status_)code = 404,
+            status_code = 404,
             detail="Item not found.")
     else:
         delete_item_in_database(item)
@@ -845,6 +853,15 @@ def test_delete_nonexistent_item():
         json = response.json()
         assert json == {"detail":"Item not found."}
 ```
+
+#### 1. System test
+You've built your FastAPI application and added unit tests to verify code functionality. Writing a system test for an API endpoint will ensure that the endpoint works on the running application.
+
+We can't run the FastAPI server directly with "Run this file" - see the instructions for how to run the server and test your code from the terminal.
+
+- Review the GET endpoint defined in main.py.
+- Complete the following system test in system_test.py
+- In the terminal, run pytest.
 
 ## Building a JSON CRUD API
 
@@ -866,6 +883,15 @@ def test_delete_nonexistent_item():
 **Delete**
 - DELETE operation
 
+When we manage objects in a database, there are four steps in the lifecycle. 
+- First we create objects, and then we can read and update them whenever we want. But once we delete an object, its lifecycle is over. 
+    - We create objects with POST operations.
+    - We read objects with GET operations.
+    - We update objects with PUT operations. 
+    - And we delete objects with DELETE operations
+    
+With our four object lifecycle steps tied to these four API operations, we can build a FastAPI application to manage database objects following the HTTP Protocol.
+
 ### JSON CRUD API Motivation
 
 **Fundamentals**
@@ -875,10 +901,12 @@ def test_delete_nonexistent_item():
 
 **Opportunities**
 - Business logic for more complex data operations
-- High throughput data pipelines
+- High throughout data pipelines
 - Machine Learning inference pipelines
 
 ### Building a CRUD Module
+
+To make it easier to manage database operations from API endpoints, it's common practice to build a CRUD module. 
 
 ```python 
 from pydantic import BaseModel
@@ -894,7 +922,10 @@ class DbReview(BaseModel):
     text: str
     # Reference database ID of Reviews   
     review_id: int
+```
 
+We can build a module in a file called crud.py with methods that handled the four types of operations based on input from those models
+```python
 # crud.py
 def create_review(review: Review):
     # Create review in database
@@ -955,6 +986,7 @@ def update_review(review:DbReview):
 - Endpoint: `/reviews`
 - Input: `DbReview`
 - Output: `{}`
+
 ```python 
 @app.delete("/reviews")
 def delete_review(review: DbReview):
