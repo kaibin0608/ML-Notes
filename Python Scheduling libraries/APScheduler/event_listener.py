@@ -21,6 +21,8 @@ def bad_job():
 # ----- event listener --------------------------------------------------------
 def on_event(event):
     # event.code is a bit-mask; we check which mask it matches
+    print(type(event).__name__, event.code)
+
     if event.code & EVENT_SCHEDULER_START:
         print("⚙️  SCHEDULER STARTED")
     elif event.code & EVENT_SCHEDULER_SHUTDOWN:
