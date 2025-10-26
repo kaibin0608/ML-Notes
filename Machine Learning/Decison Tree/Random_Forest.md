@@ -38,7 +38,7 @@ After building the first tree, **go back to Step 1 and repeat**: Make a new boot
 - Using a bootstrapped sample and considering only a subset of variables at each step results in a wide variety of trees.
 - The variety is what makes random forests more effective than individual decision trees.
 
-#### How do we use random forest? 
+## How do we use random forest? 
 
 ![alt text](image-6.png)
 - First we got a new patients, we got all the measurements(variables), we want to know whether this patient has heart disease or not.
@@ -116,13 +116,13 @@ Context:
 
 &nbsp;
 
-**Missing data in the original dataset used to create the random forest**
+### 1. Missing data in the original dataset used to create the random forest
 
 ![alt text](image-17.png)
 
 - we want to create a random forest with this data
 - however, we don't know if this patient has blocked arteries or their weight 
-- the general idea for dealing with missing data in this context is to make n initial guess that could be bad, then gradually refine the guess until it is (hopefully) a good guess.
+- the general idea for dealing with missing data in this context is to make an initial guess that could be bad, then gradually refine the guess until it is (hopefully) a good guess.
 
 ![alt text](image-18.png)
 
@@ -131,7 +131,7 @@ Context:
 - So "No" is our initial guess.
 
 ![alt text](image-19.png)
-- since **weight** is numeric, our initial guess will be the medial value of the patients that **did not** have heart disease.
+- since **weight** is numeric, our initial guess will be the median value of the patients that **did not** have heart disease.
 - in this case, the median value is 167.5
 
 ![alt text](image-20.png)
@@ -194,18 +194,90 @@ Notice that samples 2,3 and 4 all ended up in the same leaf note.
     - ![alt text](image-34.png)
     - only samples 3 and 4 ended up in the same leaf node.
 
-Ultimately, we run the data doen all the trees and the proximity matrix fills in
+Ultimately, we run the data down all the trees and the proximity matrix fills in
 - ![alt text](image-35.png)
 - the we divide each proximity value by the total number of trees. In this example, assume we had 10 trees.
     - ![alt text](image-36.png)
 - Now we use the proximity values for sample 4 to make better guesses about the missing data
 
+![alt text](image-37.png)
+
 For Blocked Arteries, we calculated the weighted frequency of "Yes" and "No", using proximity values as the weights.
+- "Yes" occurs in 1/3 of the sample, YES = 1/3
+- "No" occurs in 2/3 of the sample, NO = 2/3
 
+* The weighted frequency for "Yes" is :
 
+$$ Yes = \frac{1}{3} \times \text{The weight of Yes}  $$
 
+    The weight for "Yes" = Proximity of "Yes / All Proximities
 
+![alt text](image-38.png)
+- the proximity value of sample 2 is the only one with "Yes", Divided by the sum of the all proximities
 
+$$ \frac{0.1}{0.1 + 0.1 + 0.8} = \frac{0.1}{1} = 0.1 $$
+    The weighted frequency for "Yes" is 0.03
 
+* The weighted frequency for "No" is :
+
+$$No = \frac{2}{3} \times \text{The weight of No} $$
+
+$$ \begin{align*}
+\text{The weight of No} 
+&= \frac{0.1 + 0.8}{0.1 + 0.1 + 0.8} \\
+&= \frac{0.9}{1} \\
+&= 0.9 
+\end{align*}
+$$
+    The weighted frequency for "No" is 0.6
+
+![alt text](image-39.png)
+- "No" has a way higher weighted frequency, so we will go with it. (Our new improved and revised guess)
+
+For "Weight"(numeric), we use the proximities to calculate a weighted average
+$$ 
+\begin{align*}
+\text{Weighted Average} 
+&= 125 \times \text{Sample 1' weighted average weight} + 180 \times \text{Sample 2' weighted average weight} + 210 \times \text{Sample 3' weighted average weight}\\
+&= 125 \times \frac{0.1}{0.1+0.1+0.8} + 180 \times 0.1 + 210 \times 0.8 \\
+&= 198.5
+\end{align*}$$
+
+- To calculate that weight, we use the proximity value of sample 1, divided by the sum of the all proximities
+
+Now that we have revised our guesses a little bit, we do the whole thing over again 
+- we build a random forest, 
+- run the data through the trees,
+- recalculate the missing values
+
+we do this 6 or 7 times until the missing values converge (ie. mno longer change each ttime we recalculate).
+
+**Extra notes**
+
+We can calculate distance matrix with 1 - proximity matrix and that means we can deaw a heatmap and MDS with it 
+
+### 2. Missing data in a new sample that you want to categorize
+
+Context: 
+
+Imagine we had already built a Random Forest with existing data and wanted to classify this new patient
+
+![alt text](image-41.png)
+
+we want to know he has heart disease or not, but we dont know the Arteries is blocked or not, so we ned to make a guess about Blocked Arteries so we can run the patient down all the trees in the forest.
+
+**What to do?**
+
+![alt text](image-42.png)
+
+1. we create a copy of this data, one have heart disease, one does not have
+
+![alt text](image-43.png)
+
+2. Then we use the iterative method we just talked about to make a good guess about the missing values
+
+3. Then we run the two samples down the trees in forest and we see which of the two is correctly labeled by the random forest the most times
+
+4. we select the option that correctly labeled more times than the other
 
 
