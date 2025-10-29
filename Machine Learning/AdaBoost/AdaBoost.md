@@ -55,3 +55,58 @@ Context:
 ![alt text](image-5.png)
 
 We create a **Foreast of Stumps** with AdaBoost to predict of a patient has heart disease 
+- we will make these predictions based on a patient's **Chest Pain** and **Blocked Artery** status and their **Weight**
+
+![alt text](image-7.png)
+- the first thing we do is give each sample a weight that indicates how important it is to be correctly classified
+- **Note:** The **Sample Weight** is different from the **Patient Weight**
+
+![alt text](image-8.png)
+
+1. At the start, all samples get the same weight , 1 / total number of samples = 1/8, and that makes the samples all equally important. However, after we make the first stump, these wright will change in order to guide how the next stump created.
+
+2. Now we need to make the first stump in the forest,this is done by finding the variable, **Chest Pain**, **Blocked Arteries** or **Patient Weight**, that does the best job classifying the samples.
+    - Note: Because all of the weights are the same, we can ignore them right now.
+
+3. We start by seeing how well chest pain classifies the samples.
+
+![alt text](image-9.png)
+- Of the 5 samples with Chest Pain, 3 were correctly classified as having **Heart Disease**
+
+![alt text](image-10.png)
+- and 2 were incorrectly classified
+
+![alt text](image-11.png)
+- Of the 3 samples without Chest Pain, 2 were correctly classified as not having Heart Disease
+
+![alt text](image-12.png)
+- and 1 was incorrectly classified
+
+
+
+4. Now we do the same for **Blocked Arteries**
+![alt text](image-13.png)
+
+5. And for **Patient Weight**
+
+![alt text](image-14.png)
+
+Note: We used the techniques described in the Decision Tree StatQuest to determine that 176 was the best weight to separate the patients
+
+6. Now we calculate the Gini index for the three stumps. 
+
+![alt text](image-15.png)
+
+- the Gini index for the **Patient Weight** is the lowest, so this will be the first stump in the forest.
+- Now we need to determine how much say this stump will have in the final classification 
+
+7. We determine how much say a stump has in the final classification based on how well it classified the samples.
+
+![alt text](image-17.png)
+- this stump made one error
+- This patient, who weight less than 176, has heart disease, but the stump says they do not.
+- The **Total Error** for a stump is the sum of weight associated with the incorrectly classified samples, Thus the **Total Error** here is 1/8
+
+Note: Because all of the **Sample Weights** add up to 1, **Total Error** will always be between 0, for a perfect stump, and 1, for a horrible stump.
+
+
