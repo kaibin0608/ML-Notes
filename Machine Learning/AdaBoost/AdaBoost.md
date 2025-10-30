@@ -125,9 +125,89 @@ We can draw graph of **Amount of say** by plugging in a bunchof numbers between 
 
 >Note: If **Total Error** is 1 or 0, then this equation will freak out, in practice, a small error term is added to prevent this from hapenning 
 
-8. with **Patient Weight**> 176, the **Total Error** is 1/8, so we just plug and calculate the **Amount of say**
+8. With **Patient Weight**> 176, the **Total Error** is 1/8, so we just plug and calculate the **Amount of say**
 
 $$ \text{Amount of say} = \frac{1}{2} log(7) = 0.97 $$
 
 9. After we work out the **Amount of say** of **Weight**, we work it out for **Chest Pain** and **Blocked Arteries**, which are 0.42 and 0.
 This is how we determine the amount of say 
+
+---
+
+Now we need to learn how to modify the weights so that the current stump made into account.
+
+![alt text](image-18.png)
+
+This is the first stump that we made. When we created this stump, all of the **Sample Weights** were the same and that meant we did not emphasize the importance of correctly classifying any particular sample
+
+![alt text](image-19.png)
+
+But this stump incorrectly classified this sample, we will emphasize the need for the next stump to correctly classify it by increasing its **Sample Weight** 
+
+![alt text](image-20.png) 
+
+and decrease all other sample weight. 
+
+
+Let's start by increasing the **Sample Weight** for incorrectly classified sample
+
+$$ \text{New Sample Weight} = \text{sample weight} \times e^{\text{amount of say}} $$
+
+This is the formula we will use to increase the **Sample Weight** for the sample that was incorrectly classified.
+
+$$ \text{New Sample Weight} = \frac{1}{8} \times e^{\text{amount of say}} $$
+
+>For better understand of how this part will scale the previous **Sample Weight**, let's draw a graph
+![alt text](image-21.png)
+> When the **Amount of Say** is relatively large, (ie. the last stump did a good job classifying samples) then we will scale the previous **Sample Weight** with a large number and the **New Sample Weight** will be much larger than the old one. And when the **Amount of Say** is relatively low (ie. the last stump did not do a very good job classifying samples) then the previous **Sample Weight** is scaled by a relatively small number and the **New Sample Weight** will only be a little larger than the old one.
+
+In this example, the **Amount of Say** was 0.97, and $e^{0.97} = 2.64$
+
+$$ \text{New Sample Weight} = \frac{1}{8} \times 2.64 = 0.33 $$
+
+That means the new **Sample Weight** is 0.33, which is more than the old one (1/8 = 0.125)
+
+![alt text](image-22.png)
+
+Now we need to decrease the **sample weight** of the correctly classified samples
+
+$$ \text{New Sample Weight} = \text{sample weight} \times e^{-\text{amount of say}} $$
+
+This is the formula we will use to decrease the **Sample Weight** for the sample that was correctly classified.
+
+Just like before, we plug in the sample weight and calculate the **Amount of say**
+
+> For better understanding of how this will scale the **Sample Weight**,![alt text](image-23.png)
+> When the **Amount of Say** is relatively large then we will scale the previous **Sample Weight** with a number that close to 0 and the **New Sample Weight** will very small. When the **Amount of Say** is relatively low then we will scale the **Sample Weight** by a value close to 1 and the **New Sample Weight** will just be a little smaller than the old one.
+
+In this example, the **Amount of Say** was 0.97, and $e^{-0.97} = 0.38$
+
+$$ \text{New Sample Weight} = \frac{1}{8} \times 0.38 = 0.05$$
+
+The new **Sample Weight** is 0.05 which is less than the old one (1/8 = 0.125)
+
+![alt text](image-24.png)
+
+This will be the **New Sample Weight** of each samples, then we will need to normalize the **New Sample Weight** so that they will add up to 1.
+- if we add up all the new sample weight, it will be 0.68
+- So we divide each New Sample Weight by 0.68 to get the normalized values
+
+![alt text](image-25.png)
+
+Now, when we add up the **New Sample Weights**, we get 1. Then we transfer the **Normalized Sample Weights** to the **Sample Weight** column, since those are what we will use for the next stump.
+
+![alt text](image-26.png)
+
+Now we can use the modified **Sample Weights** to make the second stump in the forest.
+
+---
+
+In theory, we cound use the **Sample Weights** to calculate **Weighted Gini Indexes** to determine which variable should split the next stump.
+
+![alt text](image-27.png)
+
+The **Weighted Gini Index** would put more emphasis on correctly classifying this sample (the one that was misclassified by the last stump), since this sample has the largest **Sample Weight**
+
+![alt text](image-28.png)
+
+Alternatively, instead of using a **Weighted Gini index**, we can make a new collection of samples that contains duplicate copies of the samples with the largest **Sample Weights**.
