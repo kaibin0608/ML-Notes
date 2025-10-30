@@ -211,3 +211,47 @@ The **Weighted Gini Index** would put more emphasis on correctly classifying thi
 ![alt text](image-28.png)
 
 Alternatively, instead of using a **Weighted Gini index**, we can make a new collection of samples that contains duplicate copies of the samples with the largest **Sample Weights**.
+
+![alt text](image-29.png)
+
+So we start by making a new empty dataset that is the same size as the original. Then we pick a number between 0 and 1, and we see where that number falls when we use the **Sample Wehgits** like a distribution
+
+![alt text](image-30.png)
+
+If the number is between 0 and 0.07, then we would put this sample into the new collection of samples.
+
+![alt text](image-31.png)
+
+And if the number is between 0.07 and 0.14 (0.07+0.07=0.14), then we would put this sample into the new collection of samples 
+
+![alt text](image-32.png)
+
+and if the number is between 0.14 and 0.21, then we would put this sample into the new collection of samples
+
+![alt text](image-33.png)
+
+if the number is between 0.21 and 0.70, then we would put this sample into the new collection of samples
+
+![alt text](image-34.png)
+
+etc.
+
+For example, imagine the first number I picked was 0.72. 
+
+![alt text](image-35.png)
+
+Then i would put this sample into my new collection of samples. 
+
+Then i pick another random number and get 0.42 
+
+![alt text](image-36.png)
+
+then i would pick this sample into my new collection of samples. etc..
+
+> Note: We might add the same particular sample to the new collection of samples
+
+Then we continue to pick random numbers and add samples to new collection until the new collection is the same size as the original
+
+![alt text](image-37.png)
+
+Ultimately, this sample was added to the new collection of samples 4 times, reflecting its larger **Sample Weight**.
