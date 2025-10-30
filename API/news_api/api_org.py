@@ -12,18 +12,19 @@ top_headlines = newsapi.get_top_headlines(
                                           page = 1)
 
 # /v2/everything
-all_articles = newsapi.get_everything(q='Kuala Lumpur',
-                                    #   sources='my',
+all_articles = newsapi.get_everything(q='SSM',
+                                      # sources='my',
                                     #   sources='bbc-news,the-verge',
                                     #   domains='bbc.co.uk,techcrunch.com',
                                       from_param='2025-10-01',
                                       to='2025-10-27',
-                                      language='en',
+                                      language='zh',
                                       sort_by='relevancy',
                                       page=2)
 
 # /v2/top-headlines/sources
 sources = newsapi.get_sources()
 
-print(top_headlines)
-# print(sources)
+# print(all_articles)
+
+print(sources)
