@@ -66,7 +66,7 @@ We create a **Foreast of Stumps** with AdaBoost to predict of a patient has hear
 1. At the start, all samples get the same weight , 1 / total number of samples = 1/8, and that makes the samples all equally important. However, after we make the first stump, these wright will change in order to guide how the next stump created.
 
 2. Now we need to make the first stump in the forest,this is done by finding the variable, **Chest Pain**, **Blocked Arteries** or **Patient Weight**, that does the best job classifying the samples.
-    - Note: Because all of the weights are the same, we can ignore them right now.
+    - >Note: Because all of the weights are the same, we can ignore them right now.
 
 3. We start by seeing how well chest pain classifies the samples.
 
@@ -91,7 +91,7 @@ We create a **Foreast of Stumps** with AdaBoost to predict of a patient has hear
 
 ![alt text](image-14.png)
 
-Note: We used the techniques described in the Decision Tree StatQuest to determine that 176 was the best weight to separate the patients
+>Note: We used the techniques described in the Decision Tree StatQuest to determine that 176 was the best weight to separate the patients
 
 6. Now we calculate the Gini index for the three stumps. 
 
@@ -107,6 +107,27 @@ Note: We used the techniques described in the Decision Tree StatQuest to determi
 - This patient, who weight less than 176, has heart disease, but the stump says they do not.
 - The **Total Error** for a stump is the sum of weight associated with the incorrectly classified samples, Thus the **Total Error** here is 1/8
 
-Note: Because all of the **Sample Weights** add up to 1, **Total Error** will always be between 0, for a perfect stump, and 1, for a horrible stump.
 
+>**Note:** Because all of the **Sample Weights** add up to 1, **Total Error** will always be between 0, for a perfect stump, and 1, for a horrible stump.
 
+- We use the **Total Error** to determine **Amount of Say** this stump has in the final classification with the following formula:
+
+$$ \text{Amount of say} = \frac{1}{2} log(\frac{1 - \text{Total Error}}{\text{Total Error}}) $$
+
+![alt text](image-16.png)
+
+We can draw graph of **Amount of say** by plugging in a bunchof numbers between 0 and 1 for total error.
+- The blue line tells us the **Amount of Say** for total Error values between 0 and 1
+- When a stump does a good job, and the **Total Error** is small then the **Amount of Say** is relatively large positive value
+- When a stump is no better at classification than flipping a coin (i.e. half of the samples are correctly classified and half are incorrectly classified) and **Total Error** = 0.5 then the **Amount of Say** is 0
+- When a stump does a terrible job and the **Total Error** is close to 1, ie: if the stump consistently gives you the opposite classification then the **Amount of SAY** will be a large negative value
+- So if a stump votes for "HEart Disease", the negative Amount of say will turn that vote into "Not Heart Disease".
+
+>Note: If **Total Error** is 1 or 0, then this equation will freak out, in practice, a small error term is added to prevent this from hapenning 
+
+8. with **Patient Weight**> 176, the **Total Error** is 1/8, so we just plug and calculate the **Amount of say**
+
+$$ \text{Amount of say} = \frac{1}{2} log(7) = 0.97 $$
+
+9. After we work out the **Amount of say** of **Weight**, we work it out for **Chest Pain** and **Blocked Arteries**, which are 0.42 and 0.
+This is how we determine the amount of say 
