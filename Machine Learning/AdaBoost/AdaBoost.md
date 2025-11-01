@@ -255,3 +255,49 @@ Then we continue to pick random numbers and add samples to new collection until 
 ![alt text](image-37.png)
 
 Ultimately, this sample was added to the new collection of samples 4 times, reflecting its larger **Sample Weight**.
+
+After get rid of the original sample, we use the new collection of samples. 
+
+![alt text](image-38.png)
+
+Lastly, we give all the sample equal **Sample Weights**, just like before
+
+![alt text](image-39.png)
+
+However, that doesn't mean the next stump will not emphasize the need to correctly classify these samples. 
+- Because these samples are all the same, they will be treated as a block, creating a large penalty for being misclassified.
+
+![alt text](image-40.png)
+
+Now we go back to the beginning and try to find the stump that does the best job classifying the new collection of samples.
+
+So that is how the errors that the first tree makes, influence how the second tree is made, and the errors that the second tree makes influence how the third tree made. etc...
+
+
+## How a forest of stumps created by AdaBoost makes classifications
+
+![alt text](image-42.png)
+
+Imagine that these stumps classified a patient as **Has Heart Disease**, and these are the **Amounts of Say** for these stumps and we get the sum of it = 2.7
+
+![alt text](image-44.png)
+
+And these stumps classified the patient as **Does Not Have Heart Disease**, and these are the **Amounts of Say** for these stumps and we get the sum of it = 1.23
+
+Ultimately, the patient is classified as **Has Heart Disease** because this is the larger sum
+
+## Summary
+
+![alt text](image-41.png)
+
+1. **AdaBoost** combines a lot of "weak learners" to make classifications. The weak learners are almost aways **stumps**
+
+![alt text](image-43.png)
+
+2. Some **Stumps** get more say in the classification than others.
+
+![alt text](image-45.png)
+
+3. Each **Stump** is made by taing the previous **Stump's** mistakes into account 
+
+> If we have a **Weighted Gini Function**, then we ise it with the **Sample Weights**, otherwise we use the **Sample Weights** to make a new dataset that reflects those weights.
