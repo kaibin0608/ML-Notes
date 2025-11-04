@@ -64,13 +64,40 @@ $$
 
 and save the difference which is called the **Pseudo Residual**, in a new column.
 
+![alt text](image-6.png)
+
 > Note: The term **Pseudo Residual** is based on **Linear Regression**, where the difference between the **Observed** vales and the **Predicted** values results in **Residuals**
 
+> The "Pseudo: part of Pseudo Residual is a reminder that we are doing Gradient Boost, not Linear Regression
 
+Now we do the same thign for the remaining weight
 
+![alt text](image-7.png)
 
+Now we will build a Tree using **Height**, **Favourite Color** and **Gender** to predict the residuals.
 
+![alt text](image-8.png)
 
+Setting aside the reason why we are building a tree to predict the residuals for the time being, here's the tree. In the example, we are only allowing up to four leaves but when using a larger dataset, it is common to allow anywhere from 8 to 32 
 
+By restricting the total number of leaves, we get fewer leaves than residuals.
 
+![alt text](image-9.png)
 
+As a result, these two rows of data go to the same leaf.
+
+![alt text](image-10.png)
+
+so we replace these residuals with their average.
+
+$$ \frac{(-14.2-15.2){2} = -14.7} $$
+
+![alt text](image-11.png)
+
+And these two rows of data go to the same leaf, so we replace the residuals with the average (1.8+5.8)/2 = 3.8
+
+![alt text](image-12.png)
+
+Now we can combine the original leaf with the new tree to make a new prediction of an individual's *Weight** from the **Training Data**
+
+We start with the initial **Prediction**,71.2
