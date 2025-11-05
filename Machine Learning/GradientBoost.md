@@ -90,7 +90,7 @@ As a result, these two rows of data go to the same leaf.
 
 so we replace these residuals with their average.
 
-$$ \frac{(-14.2-15.2){2} = -14.7} $$
+$$ \frac{(-14.2-15.2)}{2} = -14.7 $$
 
 ![alt text](image-11.png)
 
@@ -100,4 +100,26 @@ And these two rows of data go to the same leaf, so we replace the residuals with
 
 Now we can combine the original leaf with the new tree to make a new prediction of an individual's *Weight** from the **Training Data**
 
-We start with the initial **Prediction**,71.2
+![alt text](image-13.png)
+
+We start with the initial **Prediction**,71.2 then we run the data down the tree and we get 16.8. S0 the **Predicted Weight**= 71.2 + 16.8 = 88, which is the same as the **Obeserved weight** 
+
+But this data fit the model too well. In other words, we have low **Bias**, but probablu very high **Variance**
+
+![alt text](image-14.png)
+
+**Gradient Boost** deals with this problem by using a ***Learning Rate** to scale the contribution from the new tree
+- **Learning Rate** is a value between 0 and 1
+
+In this case, we set the learning rate to 0.1.
+
+Now, the **Predicted Weight** is 
+$$ 71.2 + (0.1 \times 16.8) = 72.9 $$
+
+With the **Learning Rate** set to 0.1, the new **Prediction** isn't as good as it was before, but it's a little bit better than the **Prediction** made with just the original leaf, which predicted that all samples would weigh 71.2
+
+In other words, scaling the tree by **Learning Rate** results in a small step in the right direction. 
+
+According to the dude that invented **Gradient Boost**, Jerome Friedman, empirical evidence shows that taking a lots of small steps in the right direction results in better **Predictions** with a **Testing Dataset**, ie. lower **Variance**
+
+Let's build another tree
