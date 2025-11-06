@@ -122,4 +122,83 @@ In other words, scaling the tree by **Learning Rate** results in a small step in
 
 According to the dude that invented **Gradient Boost**, Jerome Friedman, empirical evidence shows that taking a lots of small steps in the right direction results in better **Predictions** with a **Testing Dataset**, ie. lower **Variance**
 
-Let's build another tree
+Let's build another tree so we can take another small step in the right direction
+
+![alt text](image-15.png)
+
+just like before, we calculate the Pseudo Residual, the difference between the **Observed Weights** and our latest **Predictions**
+
+$$\text{Residual} = (\text{Observed} - \text{Predicted}) $$
+
+![alt text](image-16.png)
+
+We plug in the observed weight and the new **Predicted Weight**
+
+$$\text{Residual} = (88 - (71.2 + 0.1 \times 16.8)) =15.1 $$
+
+and we save it in the column for **Psuedo Residuals**
+
+![alt text](image-17.png)
+
+Then we repeat for all the individuals in the training dataset
+
+![alt text](image-18.png)
+
+>Note: These are the original **Residuals**, from when our **Prediction** was simply the average overall Weight on the left
+
+>And on the right, these are the **Residuals** after adding the new tree scaled by the **Learning Rate**
+
+The New **Residuals** are all smaller than before, so we have taken a small step in the right direction.
+
+![alt text](image-19.png)
+
+Then we build a new tree for the new residuals.
+
+![alt text](image-20.png)
+
+Here is the new tree.
+> Note: In this example, the branches are the same as before. However, in practice, the trees can be different each time.
+- Just like before, since multiple samples ended up in the first and the third leaves, we just replace the **Residuals** with their averages
+
+![alt text](image-22.png)
+
+Now we combine the new Tree with the previous Tree and the initial **Leaf**
+- We scale all of the **Trees** by the **Learning Rate**, which we set to 0.1 and add everything together.
+
+Now we are ready to make the new predictions for the training data
+1. just like before, we start with the initial predictions
+2. then add the scaled amount from the first tree and the scaled amount from the second Tree
+
+![alt text](image-23.png)
+
+$$ 71.2 + (0.1 \times 16.8) + (0.1 \times 15.1) = 74.4$$
+
+Which is another small step closer to the **Observed Weight**(88). 
+
+Now we use the initial leaf, plus the scaled value from the first tree, plus the scaled value from the second tree to calculate the new **Residuals**
+
+![alt text](image-24.png)
+>Remember, the first column is the residuals from the first prediction, second columns are the residuals after we add the first tree to the prediction, third column are the residuals after we added the second tree to the prediction
+
+> Each time we add a tree to the **Prediction**, the **Residuals** get smaller
+
+So we have taken another small step towards making good **Predictions**
+
+Now we build another tree with the new residuals, and add it to the chain of **Trees** that we have already created, and we keep making trees until we reach the maximum specified, or adding additional trees does not significantly reduce the size of the **Residuals**.
+
+Then, we we get some new measurement, we can **Predict Weight** by starting with the initial predictions(71.2), then add the scaled value from the first tree, and the second tree and the third tree, etc.
+
+When the math is all done, we are left with the **Predicted Weight**
+
+![alt text](image-25.png)
+
+In this case, we predicted that this person **Weighed 70** kg
+
+---
+
+### Summary
+
+When Gradient Boost is used for regression, we start with a leaf that is the average value of the variable we want to **Predict**
+
+In this case, we want to predict **Weight**.Then we add a tree based on the **Residuals** and the difference between the **Observed** values and the **Predicted** values
+and we scale the tree's contribution to the final **Prediction** with a **Learning Rate**. Then we add another tree based on the the new **Residuals** and we keep adding trees based on the error made by the previous tree. 
