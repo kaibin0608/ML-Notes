@@ -1,56 +1,49 @@
-import worldnewsapi 
-# from worldnewsapi.rest import ApiException
+import requests
+import urllib.parse
 
-"""Run the news API scraper to fetch SSM-related news."""
-# api_key = "0d033f49793b4de5a06b3cf353d2ed80"
-base_url = "https://api.worldnewsapi.com/search-news-sources"
+def search_world_news(keywords, starting_date, ending_date, language="en"):
+    """
+    Search articles using World News API with multiple keywords (ORed together).
+    
+    Parameters
+    ----------
+    keywords : list of str
+        Keywords to search for. The search will match any of these (using OR).
+    starting_date : str
+        Earliest publish date, format YYYY-MM-DD.
+    ending_date : str
+        Latest publish date, format YYYY-MM-DD.
+    language : str, optional
+        Language code, default "en".
+    """
+    api_key = "96c129136e4d47ae9f6234455a0841fd"
+    base_url = "https://api.worldnewsapi.com/search-news"
+    
+    # Build the text parameter: join keywords with ' OR '
+    text_query = " OR ".join(keywords)
+    # URL-encode it
+    text_param = urllib.parse.quote(text_query)
+    
+    params = {
+        "text": text_param,
+        "language": language,
+        "earliest-publish-date": starting_date,
+        "latest-publish-date": ending_date  # if this param is supported
+    }
+    headers = {
+        "x-api-key": api_key
+    }
+    
+    response = requests.get(base_url, headers=headers, params=params)
+    if response.status_code == 200:
+        return response.json()
+    else:
+        return {"error": response.status_code, "message": response.text}
 
-# Initial SDK configuration
-newsapi_configuration = worldnewsapi.Configuration(api_key={'apiKey': "0d033f49793b4de5a06b3cf353d2ed80"})
-
-try:
-	newsapi_instance = worldnewsapi.NewsApi(worldnewsapi.ApiClient(newsapi_configuration))
-
-	max_results = 250   # replace with your maximum
-	offset = 0
-	all_results = []
-
-	while len(all_results) < max_results:
-
-		request_count = min(100, max_results - len(all_results)) # request 100 or the remaining number of articles
-
-		response = newsapi_instance.search_news(
-			# name = "orientaldaily"
-			text='SSM',
-			source_country='my',
-			# language='zh',
-			earliest_publish_date='2025-10-01',
-			latest_publish_date='2025-10-30',
-			# # categories='sports',
-			sort="publish-time",
-			sort_direction="desc",
-			min_sentiment=-0.8,
-			max_sentiment=0.8,
-			offset=offset,
-			number=request_count
-			)
-
-		print("Retrieved " + str(len(response.sources)) + " source name. Offset: " + str(offset) + "/" + str(max_results) +
-			  ". Total available: " + str(response.available) + ".")
-
-		if len(response.sources) == 0:
-			break
-
-		all_results.extend(response.sources)
-		offset += 100
-
-except worldnewsapi.ApiException as e:
-	print("Exception when calling NewsApi->search_news: %s\n" % e)
-
-
-for article in all_results:
-    print("\nTitle: " + str(article.title))
-    print("Author: " + str(article.authors))
-    print("URL: " + str(article.url))
-    print("Sentiment: " + str(article.sentiment))
-    print("Text: " + str(article.text[:80]) + "...") # print first 80 characters of the text
+if __name__ == "__main__":
+    result = search_world_news(
+        keywords=["earthquake", "tsunami", "volcanic eruption"],
+        starting_date="2025-11-01",
+        ending_date="2025-11-03"
+    )
+    print(result)
