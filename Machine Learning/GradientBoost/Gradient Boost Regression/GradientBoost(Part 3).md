@@ -183,4 +183,86 @@ Now we calculate the new **Log(Odds) Prediction** for the second person
 
 ![alt text](image-83.png)
 
-The **log(odds) Prediction** is the previous **Prediction**,0.7 plus the **Output Value** from the tree scaled by the **Learning Rate**
+The **log(odds) Prediction** is the previous **Prediction**, 0.7 plus the **Output Value** from the tree scaled by the **Learning Rate**, 0.8 times -1
+
+$$\text{log(odds) Prediction} = 0.7 + (0.8 \times -1) = -0.1 $$
+
+which gives us -0.1 for the new **Prediction**. Now we concert the new **log(odds) Prediction** into a **Probability**
+
+$$Probability = \frac{e^{-0.1}}{1+ e^{-0.1}} = 0.5 $$
+
+and save the new **Predicted Probability** 0.5, here
+
+![alt text](image-84.png)
+
+> Note: This new predicted probability is worse than before, and this is one reason why we build a lot of trees, and not just one.
+
+![alt text](image-85.png)
+
+Then we calculate the **Predicted Probabilities** for the remaining people. Then we calculate the new **Residuals**
+
+![alt text](image-86.png)
+
+**Residuals** are difference between the **Observed** and **Predicted Probabilities** and just like before, we can plot the **Observed Probabilities** on a graph
+
+![alt text](image-87.png)
+
+However, now everyone has a different **Predicted Probability**. So, to calculate the **Residual** for the first person, $Residual = (1-0.9) = 0.1$. We do the same for the rest of the observations.
+
+![alt text](image-88.png)
+
+Now, we have the residuals, we can build the new tree and then we need to calculate the **Output Values** for each leaf.
+
+![alt text](image-89.png)
+
+Let's start with this leaf
+
+![alt text](image-90.png)
+
+Only the second person goes to this leaf. So we plug in the **Residual** into the formula for the **Output Values**
+
+$$
+\begin{align*} 
+&\frac{\sum_i \text{Residual}_i}{\sum_i \left[ \text{Previous Probability}_i \times (1 - \text{Previous Probability}_i) \right]} \\
+&=  \frac{0.5}{0.5\times (1-0.5)}
+&= 2
+\end{align*}
+$$
+
+And the output value for this leaf is 2.
+
+![alt text](image-91.png)
+
+Now let's calculate the Output Value for this leaf.
+
+![alt text](image-92.png)
+
+ Only the third person goes to this leaf. So we plug in the **Residual** into the formula for the **Output Values**. Then we plug in the last **Predicted Probability**
+
+ $$ \frac{-0.5}{0.5\times (1-0.5)} = -2 $$
+
+ Lastly, let's calculate the output values for this leaf
+
+ ![alt text](image-93.png)
+
+ A bunch of people goes to this leaf. So we plug the **Residuals** into the formula for the **Output Values**
+
+$$ \frac{0.1+ -0.1 + 0.1 + 0.1}{(0.9 \times (1-0.9)) + (0.9 \times (1-0.1)) + (0.9 \times (1-0.9)) + (0.9 \times (1-0.9))} = 0.6 $$
+
+and the output value for this leaf is 0.6
+
+Now that we have calculated all of the **Output Values** for this tree, we can combine it with everything else we have doen so far
+
+![alt text](image-94.png)
+
+We started with just a leaf, which made one **Prediction** for every individual. Then we built a tree based on the **Residuals**, the difference between the **Observed** values and the single value **Predicted** by leaf.
+
+![alt text](image-95.png)
+
+Then we calculted the **Output Values** for each leaf and we scaled it with the **Learning Rate**
+
+![alt text](image-96.png)
+
+Then we built another tree based on the new **Residuals**, the difference between the **Observed** values and the values **Predicted** by the leaf and the first tree then we calculated the **Output Values** for each leaf and we scaled this new tree with the **Learning Rate** as well
+
+This process repeats until we have made the maximum number of trees specified, or the residuals get super small.
