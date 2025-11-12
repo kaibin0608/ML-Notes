@@ -131,4 +131,46 @@ $$
 
 > Note: For now, the **Previous Probabilities** are the same for all of the **Residuals**, but this will change when we build the next tree.
 
+![alt text](image-76.png)
+
 and the **Output Value** for this leaf is -1
+
+![alt text](image-77.png)
+
+Now let's determine the **Output Value** for this leaf. We plug the **Residuals** into the formula and previous probability, can do the math
+
+$$ 
+\frac{0.3 + 0.3 +0.3}{(0.7 \times (1 - 0.7)) + (0.7 \times (1 - 0.7)) + (0.7 \times (1 - 0.7))} = 1.4
+$$
+
+![alt text](image-78.png)
+
+We have calculated the **Output Values** for all three leaves in the tree!
+
+![alt text](image-79.png)
+
+Now we are ready to update our **Predictions** by combining the initial leaf with the new tree
+
+> Note: Just like before , the new tree is scaled by a **Learning Rate**
+
+This example uses a relatively large **Learning Rate** for illustrative purposes. However, 0.1 is more common.
+
+
+![alt text](image-80.png)
+
+Now let's calculate the **log(odds) Prediction** of this person. The **Log(odds) Prediction** is the prevous **Prediction**, 0.7, plus the **Output Value** from the tree scaled by the **Learning Rate**
+
+![alt text](image-81.png)
+
+$$\text{log(odds) Prediction} = 0.7 + (0.8 \times 1.4) = 1.8$$
+
+and the new log(odds) Prediction = 1.8. Now we can convert the new **Log(odds) Prediction** into a **Probability**
+
+$$
+\begin{align*}
+\text{Probability} &= \frac{e^{log(odds)}}{1+e^{log(odds)}} \\
+&= \frac{e^{l1.8}}{1+e^{1.8}} \\
+&= 0.9
+\end{align*}$$ 
+
+
