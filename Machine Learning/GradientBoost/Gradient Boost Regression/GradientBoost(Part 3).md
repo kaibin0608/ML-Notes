@@ -173,4 +173,14 @@ $$
 &= 0.9
 \end{align*}$$ 
 
+and the new predicted probability = 0.9. So we are taking a small step in the right direction since this person **Loves Troll 2** 
 
+![alt text](image-82.png)
+
+we save the new **Predicted Probability** here
+
+Now we calculate the new **Log(Odds) Prediction** for the second person
+
+![alt text](image-83.png)
+
+The **log(odds) Prediction** is the previous **Prediction**,0.7 plus the **Output Value** from the tree scaled by the **Learning Rate**
