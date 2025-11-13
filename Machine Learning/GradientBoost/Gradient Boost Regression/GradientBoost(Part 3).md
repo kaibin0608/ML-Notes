@@ -266,3 +266,45 @@ Then we calculted the **Output Values** for each leaf and we scaled it with the 
 Then we built another tree based on the new **Residuals**, the difference between the **Observed** values and the values **Predicted** by the leaf and the first tree then we calculated the **Output Values** for each leaf and we scaled this new tree with the **Learning Rate** as well
 
 This process repeats until we have made the maximum number of trees specified, or the residuals get super small.
+
+---
+
+![alt text](image-97.png)
+
+Now, for the sake of keeping the example relatively simple, imagone that we configured **Gradient Boost** to just make these two trees and we needed to **Classify**a new person as someone who **Loves Troll 2** or **does not Love Troll 2**.
+
+![alt text](image-98.png)
+
+The **Prediction** starts with the leaf.then we run the data down the first tree.
+
+![alt text](image-99.png)
+
+and we add the scaled output 
+
+$$\text{Log(odds) Prediction that someone Loves Troll 2} = 0.7 + (0.8 \times 1.4)$$
+
+then we run the data down the second tree 
+
+![alt text](image-100.png)
+
+and then we add the scaled output value and do the math 
+
+$$\text{Log(odds) Prediction that someone Loves Troll 2} = 0.7 + (0.8 \times 1.4) + (0.8 \times 0.6) = 2.3$$
+
+and get 2.3 as the **Log(odds) Prediction** that this person **Loves Troll 2**
+
+Now we need to convert this **Log(odds)** into **Probability**.
+
+$$Probability = \frac{e^{2.3}}{1+ e^{2.3}} = 0.9$$
+
+and the predicted probability is 0.9.
+
+Since we are using 0.5 as our threshold for deciding how to **Classify** people, and 0.9 > 0.5, we will classify this person as someone who **Loves Troll 2**
+
+> Note: Before we go, I want to remind you that **Gradient Boost** usually uses trees with between 8 to 32 leaves
+
+> We use small trees in this STatQuest because our **Training Dataset was super small
+
+
+
+
