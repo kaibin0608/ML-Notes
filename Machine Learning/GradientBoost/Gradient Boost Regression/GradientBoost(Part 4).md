@@ -103,6 +103,7 @@ $$-[ \text{Observed} \times \log(p) + (1 - \text{Observed}) \times \log(1 - p) ]
 Now we need to transform this equation, the **negative log(likelihood)**, so that it is a function of the predicted **log(odds)** instead of the predicted probability, $p$ and we need to simplify it.
 
 Simplify:
+
 $$
 \begin{align*}
 & - \left[ \text{Observed} \times \log(p) + (1 - \text{Observed}) \times \log(1 - p) \right] \\
@@ -111,8 +112,109 @@ $$
 &= -\text{Observed} \times \left[\log(p) - \log(1 - p)\right] - \log(1 - p) \\
 &= -\text{Observed} \times \log(\text{odds}) - \log(1 - p)
 \end{align*}
-=$$
+$$
 
->Note: The relationship between probability, $p$, annd the **log(odds)** is derived in the **StatQuest** on odds and log(odds), so check that out if you want more details. $ log(\frac{p}{1-p}) = log(odds)$
+>Note: The relationship between probability, $p$, and the **log(odds)** is derived in the **StatQuest** on odds and log(odds), so check that out if you want more details. $ log(\frac{p}{1-p}) = log(odds)$
 
+Now we need to convert **log(1-p)** into a function of the **log(odds)**. 
+
+Now, we replace 1 with this fraction do the subtraction, then convert the division into subtraction, and since the log(1) = 0, we can remove it 
+
+$$ 
+\begin{align*}
+log(1-p) &= log(1- \frac{e^{log(odds)}}{1+ e^{log(odds)}}) \\
+&= log(\frac{1+ e^{log(odds)}}{1+ e^{log(odds)}}- \frac{e^{log(odds)}}{1+ e^{log(odds)}}) \\
+&= log(\frac{1}{1+ e^{log(odds)}}) \\
+&= log(1) - log(1 + e^{log(odds)}) \\
+&= - log(1 + e^{log(odds)}) 
+\end{align*}$$
+
+> Note: The relationship between probability, $p$, and the **log(odds)** is derived in the **Logistic Regression StatQuest** on estimating parameters with **Maximum Likelihood**
+
+Thus, the **log(1-p)**, which is a function of the predicted probability, p, can be transformed into a function of the predicted **log(odds)**, so lets plug that in 
+
+$$
+\begin{align*}
+& - \left[ \text{Observed} \times \log(p) + (1 - \text{Observed}) \times \log(1 - p) \right] \\
+&= -\text{Observed} \times \log(p) - (1 - \text{Observed}) \times \log(1 - p) \\
+&= -\text{Observed} \times \log(p) - \log(1 - p) + \text{Observed} \times \log(1 - p) \\
+&= -\text{Observed} \times \left[\log(p) - \log(1 - p)\right] - \log(1 - p) \\
+&= -\text{Observed} \times \log(\text{odds}) - \log(1 - p)\\
+&= - \text{Observed} \times log(odds) + log( 1+ e^{log(odds)})
+\end{align*}
+$$
+
+>Note : the sign changed from negative(line 5) to positive(line 6) because we replaced **log( 1 - p )** with $-log(1+e^{log(odds)})$
+
+We converted the negative **log(likelihood)** of the data, which is a function of the predicted probability, $p$ into a function of predicted **log(odds)**. So
+$$ - \text{Observed} \times log(odds) + log( 1+ e^{log(odds)}) $$
+is the **Loss Function**. Now we just need to show that it is differentiable
+
+So let's take the derivative of the **Loss Function** with respect to predicted **log(odds)**
+
+$$
+\begin{align*}
+&\frac{d}{d \log(odds)} -\text{Observed} \times \log(odds) + log( 1+ e^{log(odds)}) \\
+&= -\text{Observed} + \frac{1}{1+ e^{log(odds)}}\times e^{log(odds)} \\ 
+&= -\text{Observed} + \frac{e^{log(odds)}}{1+ e^{log(odds)}} \\ 
+&= -\text{Observed} + p
+\end{align*}
+$$
+
+> Note: Earlier we saw that we can substitute the predicted probability, $p$, with this fraction $\frac{e^{log(odds)}}{1+ e^{log(odds)}}$ but we can also swap the predicted probability, $p$, back in
+
+As we will soon see, sometimes it's easier to use the function of the **logg=(odds)** and sometimes it's easier to use the function of the probability,$p$.
+
+![alt text](image-108.png)
+
+In summary, the input data is the **Training Dataset** 
+
+![alt text](image-109.png)
+
+and this is just a transformation of the negative **log(likehood)**, is the differentiable **Loss Function** and the derivative can be a function of the predicted **log(odds)** or a function of the predicted probability, $p$
+
+![alt text](image-110.png)
+
+## Step 1
+
+### Initialize model with a constant value: 
+
+$$F_0(x) = argmin_\gamma \sum^n_{i=1} L(y_i,\gamma)$$
+
+Just like when we used **Gradient Boost** for  **Regression**, we need to come up with the initial **Prediction** and just like before, we will use this funky looking equation to find the optimal initial **Prediction**
+
+![alt text](image-111.png)
+
+this is just the **Loss Function**
+- $y_i$ refers to the **Observed** values
+- $\gamma$ refers to a **log(odds)** value
+- in theory, we could go ahead and replace the **Log(odds)** with **gamma** but it's actually easier to see what's going on if we leave the **log(odds)** in and remember that it represents **Gamma**
+- The summation means that we add up one **Loss function** for each **Observed** value
+- The "argmin over gamma" means we need to find a **log(odds)** value that minimizes this sum
+
+The first thing we do is take the derivative of each term with respect to the **Log(odds)**
+
+![alt text](image-112.png)![alt text](image-113.png)
+
+Now, to make the next steps super easy, let's replace the **log(odds)** with the predicted probability, $p$ 
+
+![alt text](image-114.png)
+
+set the sum of the derivatives equal to zero
+
+![alt text](image-115.png)
+
+and solve.
+
+$$
+\begin{align*}
+-1 + p -1 + p - 0 + p &= 0 \\
+-2 + 3 \times p &= 0 \\
+ p &= \frac{2}{3}
+\end{align*}
+$$
+
+![alt text](image-116.png)
+
+and we end up with the $\frac{2}{3}$ for the initial predicted probability, $p$, because 2 people **Love Troll 2** and there are 3 people in the **Training Dataset**
 
