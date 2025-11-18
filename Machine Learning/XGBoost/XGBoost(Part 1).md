@@ -26,3 +26,19 @@ However, to keep the examples from getting out of hand, we will use this super s
 ![alt text](image-2.png)
 
 The very first step in fitting **XGBoost** to the **Training data** is to make an initial prediction
+
+This prediction can be anything, but by default it is 0.5, regardless of whether you are using **XGBoost** for **Regression** or **Classification**
+
+![alt text](image-3.png)
+
+The prediction corresponds to this thick, black horizontal line and the **Residuals**, the difference between the **Observed** and **Predicted** values, show us how good the initial prediction is.
+
+Now, just like unextreme Gradient Boost, **XGBoost** fits a **Regression Tree** to the residuals
+
+![alt text](image-4.png)
+
+However, unlike unextreme **Gradient Boost**, which typically uses regular, off-the-shelf, **Regression Trees**. **XGBoost** uses a unique **Regression Tree** that I cann an **XGBoost Tree**.
+
+## How to build an **XGBoost Tree** for Regression 
+
+> Note: There are many ways to build **XGBoost** Trees. We focus on the most common way to build them for **Regression**
