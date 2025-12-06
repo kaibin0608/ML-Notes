@@ -231,3 +231,98 @@ $$
 if $\lambda$ = 0, then there is no **Regularization** and the **Output Value** = -2 
 
 On the other hand, if $\lambda$ = 1, then the **Output Value = -0.4** which is closer to zero than -2, when $\lambda$ = 0 
+
+In other words, when $lambda$ > 0, then it reduces the amount that this single observation adds to the new prediction.
+
+Thus, $\lambda$, the **Regularization Parameter**, reduces the prediction's sensitivity to isolate observations.
+
+![alt text](image-63.png)
+
+For now, we will let $\lambda$ = 0 because this is the default value and put -2 under the leaf so we will remember it. 
+
+![alt text](image-64.png)
+
+Similarly, when $\lambda = 0$, the output value for this leaf is 2
+
+$$
+\frac{ 0.5 + 0.5}
+     {0.5 \times (1-0.5) + 0.5 \times (1-0.5) + 0} =2
+$$
+
+> Note: if $\lambda$ = 1 then we get 0.67, which is closer to 0 but the effect of $\lambda$ is smaller, this time because there are two observations in this leaf
+
+![alt text](image-65.png)
+
+Lastly, when $\lambda$ = 0, the **Output Value** for this leaf is -2. We have completed the first tree, now we can make new **Predictions**
+
+---
+
+Just like other boosting methods, **XGBoost** for **Classification** makes new predictions by startiung with initial predictions
+
+![alt text](image-66.png)
+
+However, just like with unextreme **Gradient Boost** for **Classification**, we need to convert this probability to a **log(odds)** value.
+
+$$\frac{p}{1-p} = odds$$
+
+So, since this is the formula that converts probabilities to odds. We can get a formula that converts probabilities to the **log(odds)** by taking the log of both sides. $log(\frac{p}{1-p}) = log(odds)$
+
+In this case, we plug in $p = 0.5$ and do the math, and we see that when $p = 0.5$, the $log(odds) = 0$
+
+![alt text](image-67.png)
+
+Now, just like unextreme **Gradient Boost** for **Classification**, we add the **log(odds)** of the initial prediction to the output of the **Tree**, scaled by a **Learning Rate**
+
+**XGBoost** calls the **Learning Rate** $\eta$ and the default value is 0.3, so that's what we will use. 
+
+![alt text](image-68.png)
+
+Thus, the new **Predicted** value for this observation, with **Dosage = 2** is the **log(odds)** of original prediction, 0, plus the **Learning Rate**, 0.3 times the **Output Value**,-2 and that gives us a **log(odds)** value = -0.6.
+
+## Logistic Regression 
+
+![alt text](image-69.png)
+
+To convert a **log(odds)** value into a probability, we plug it into the **Logistic Function** and the new predicted probability is 0.35
+
+$$ \text{Probability} = \frac{e^{-0.6}}{1 + e^{-0.6}} = 0.35$$
+
+![alt text](image-70.png)
+
+remember the original prediction was 0.5 and this was the original **Residual**. Now the new predicted probability is 0.35 and the new **Residual** is smaller than before, so we have taken a small step in the right direction.
+
+![alt text](image-71.png)
+
+> Note: You may be wondering why we even bothered adding the **log(odds)** of the initial prediction since it is 0
+
+![alt text](image-72.png) ![alt text](image-73.png)
+
+This is always the case if you use the default value 0.5, for the initial prediction. However, you can change the initial prediction to any probability and any value other than **0.5** will give you something more interesting to add.
+
+![alt text](image-74.png)
+
+For example, if 75% of observations in the **Training Data** said that the drug was effective, we might set the initial prediction to 0.75 and now the initial **log(odds) = 1.1** so we will plug 1.1 into the equation instead of 0 
+
+![alt text](image-75.png)
+
+But since the default initial prediction is 0.5, we will use 0 for the initial **log(odds)** in the remaining examples.
+
+![alt text](image-76.png)
+
+Using the same methods, we make a new prediction for this observation, with **Dosage = 8**. we will get 0.65 as the predicted probability. And the new **Residuals** is smaller than before. 
+
+Likewise, the new predictions for the remaining observations have smaller **Residuals** than before.
+
+![alt text](image-77.png)
+
+Now we have the new residuals, we can build the second tree that is fit to the new **Residuals**
+
+![alt text](image-78.png)
+
+>Note: When we build the second tree, calculating the **Similarity Scores** is a little more interesting because the **Previous Probabilities** are no longer the same for all the observations.
+
+![alt text](image-79.png)
+
+similar the the **Output Value**. After we get the new tree, we add it to all the previous predictions and make new predictions that give us even smaller **Residuals**. 
+
+Then we build another tree based on the new **Residuals** and we keep building trees until the **Residuals** are super small, or we have reached the maximum number of trees.
