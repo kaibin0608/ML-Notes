@@ -52,4 +52,21 @@ But since both sides of the threshold represent a lot of people who have positiv
 
 ![alt text](image-87.png)
 
-In contrast, if we had two quantiles, then our predictions would improve because we would do a better job separating observations with positive values for **Drug Effectiveness**
+In contrast, if we had two quantiles, then our predictions would improve because we would do a better job separating observations with positive values for **Drug Effectiveness** from observations with negative values for **Drug Effectiveness** . So, for this data, two quantiles are better than one.
+
+![alt text](image-88.png)
+
+If we ahve 5 quantiles, then our predictions would be more accurate, since each threshold represents a smaller cluster of observations.
+
+However, the more quantiles we have, the more thresholds we will have to test, and that means it will take longer to build the tree.
+
+For **XGBoost** the **Approximate Greedy Algorithm** means that instead of testing all possible thresholds, we only test the quantiles. By default, the **Approximate Greedy Algorithm** uses about 33 quantiles.
+
+> Why "about 33 quantiles" instead of "exactly 33 quanntiles"
+
+To answer that question, we need to talk about **Parallel learning** and the **Weighted Quantile Sketch**
+
+## Weighted Quantile Sketch
+
+
+
