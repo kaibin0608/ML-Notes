@@ -68,5 +68,104 @@ To answer that question, we need to talk about **Parallel learning** and the **W
 
 ## Weighted Quantile Sketch
 
+When we have a lot of data, so much data that we cannot fit all into a computer's memory at one time, then things that seem simple, like sorting a list of numbers and finding quantiles, become really slow.
 
+To get around this problem, a class algorithms, called **Sketches**, can quickly create approximate solutions.
 
+### How XGBoost uses Sketches
+
+![alt text](image-89.png)
+
+For this example, imagine we are just using a ton of **Dosages** to predict **Drug Effectiveness** 
+
+![alt text](image-90.png)
+
+And imagine splitting it into small pieces and putting the pieces on different computers on a network.
+
+![alt text](image-91.png)
+
+The **Quantile Sketch Algorithm** combines the values fron each computer to make an approximate histogram. 
+
+![alt text](image-92.png)
+
+Then the approximate histogram is used to calculate the approximate quantiles. And the **Approximate Greedy Algorithm** uses approximate quantiles 
+
+Since **XGBoost** uses **weighted quantile sketch**, so that means these quantiles are not normal everydaty quantiles.  
+
+Usually quantiles are set up so that the same number of observations are in each one. In contrast, with weighted quantiles, each observation has a corresponding **Weight**
+
+![alt text](image-93.png)
+
+![alt text](image-94.png)
+
+And the sum of the **Weights** are the same in each quantile. For example, if the sum of the **Weights** in the first quantile was 10, then the second quantile will also be 10, etc.
+
+The weights are derived fron the **Cover** metric that we discueesd in part 2 and 3 in this series.
+
+![alt text](image-95.png)
+
+Specifically, the weight for each observation os the 2nd derivative of the **Loss Function**, what we are referring to as the **Hessian**. That means for **Regression**, the **Weights** are all equal to 1. And that means the weighted quantiles are just like normal quantiles and contain an equal number of observations. 
+
+![alt text](image-96.png)
+
+In contrast, for **Classification, the weights are 
+
+$$\text{Weight} = \text{Previous Probability}_i \times (1-\text{Previous Probability}_i)$$
+
+So let's see how the equation for wrights effect the quantiles in **Classification** with a simple dataset.
+
+![alt text](image-98.png)
+
+These **Red** and **Green** Xs correspond to the previously predicted probabilities that these dosages are effective, and they start out at the initial prediction,0.5.
+
+![alt text](image-97.png)
+
+After we run the data down the first tree, most of the predictions improved and as we add more trees, most of the predictions get better and better.
+
+When using **XGBoost** for **Classification**, the weights for the **Weighted Quantile Sketch** are calculated from the previously predicted probabilities.
+
+So let's calculate the weights for each observation.
+
+> Note: we are just showing one example of calculating weights. In practive, weights are calculated after building each tree.
+
+![alt text](image-99.png)
+
+These predicted probabilities are very close to 0, indicating a high amount of confidence in classifying these **Dosages** as ineffective.
+
+Since the previously predicted probability for these two points is 0.1, the weight is 
+
+$$
+\begin{align*}
+\text{Weight} &= \text{Previous Probability}_i \times (1-\text{Previous Probability}_i) //
+&= 0.1 \times (1-0.1) //
+&= 0.09
+\end{align*}
+$$
+
+![alt text](image-100.png)
+
+These predicted probabilities are very close to 1, indicating that we have high confidence in classifying these **Dosages** as effective.
+
+Since the previously predicted probability for these two points is 0.9, the weight is 
+
+$$
+\begin{align*}
+\text{Weight} &= \text{Previous Probability}_i \times (1-\text{Previous Probability}_i) //
+&= 0.9 \times (1-0.9) //
+&= 0.09
+\end{align*}
+$$
+
+![alt text](image-101.png)
+
+These predicted probabilities are very close to 0.5, indicating that we not very confidence in how to classify these observations.
+
+Since the previously predicted probability for these two points is 0.6 and 0.4, the weight both are 0.24
+
+Now we see that when the previously predicted probability is close to 0.5, meaning we dont have much confidence in the classification, the weights are relatively large.
+
+In contrast, when the previously predicted probability is very close to 0 or 1, meaning we have a lot of confidence in the classification, the weights are relatively small.
+
+![alt text](image-102.png)
+
+Now, if we split this data into equal quantiles we would put the quantiles here. But remember, we are treating each quantile as a unit, and lumping the lst two observations together as unit means that they will end up in the same leaf together in the tree.
