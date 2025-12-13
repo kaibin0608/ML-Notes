@@ -150,8 +150,8 @@ Since the previously predicted probability for these two points is 0.9, the weig
 
 $$
 \begin{align*}
-\text{Weight} &= \text{Previous Probability}_i \times (1-\text{Previous Probability}_i) //
-&= 0.9 \times (1-0.9) //
+\text{Weight} &= \text{Previous Probability}_i \times (1-\text{Previous Probability}_i) \\
+&= 0.9 \times (1-0.9) \\
 &= 0.09
 \end{align*}
 $$
@@ -160,7 +160,7 @@ $$
 
 These predicted probabilities are very close to 0.5, indicating that we not very confidence in how to classify these observations.
 
-Since the previously predicted probability for these two points is 0.6 and 0.4, the weight both are 0.24
+Since the previously predicted probability for these two points is 0.6 and 0.4, the weight both are **0.24**
 
 Now we see that when the previously predicted probability is close to 0.5, meaning we dont have much confidence in the classification, the weights are relatively large.
 
@@ -169,3 +169,169 @@ In contrast, when the previously predicted probability is very close to 0 or 1, 
 ![alt text](image-102.png)
 
 Now, if we split this data into equal quantiles we would put the quantiles here. But remember, we are treating each quantile as a unit, and lumping the lst two observations together as unit means that they will end up in the same leaf together in the tree.
+
+![alt text](image-103.png)
+
+And since the positive residual will cancel out the negative residual, it will be very difficult to improve the predicted probabilities. So, instead of using equal quantiles, **XGBoost** tries to make quantiles that have a similar sum of weights 
+
+![alt text](image-104.png)
+
+In order to divide the observations into quantiles where **the sums of weights are similar**, we devide them into these quantiles.
+
+![alt text](image-105.png)
+
+The sum of the weight of first qualtile is **0.18**. The sum of the weight of second qualtile is **0.18**. The third quantile only has one obsersvation, and its weight is **0.24**. And the last quantile also only has a single observation, and its weight is **0.24**.
+
+By dividing the observations into quantiles where the sum of the **Weights are similar**, we split the two observations with low confidence predictions into separate bins.
+
+In other words, the advantage of using the **Weighted Quantile Sketch** is that we get smaller quantiles when we need them. 
+
+![alt text](image-106.png)
+
+So when we have a hige training dataset, **XGBoost** uses an **Approximate Greedy Algorithm** and that means using the **Parallel Learning** to split up the dataset so that multiple computers can work on it at the same time.
+
+![alt text](image-107.png)
+
+and a **Weighted Quantile Sketch** merges the data into an approximate histogram and the histogram is divided into **weighted quantiles** that put observations with low confidence predictions into quantiles with fewer observations.
+
+> Note: **XGBoost** only uses the **Approximate Greedy Algorithm**, **Parallel Learning** and the **Weighted Quantile Sketch** when the **Training Dataset** is huge
+
+When the training datasets are small, **XGBoost** just uses a normal, everyday **Greeedy Algorithm**.
+
+## Sparsity-Aware Split Finding
+
+Let's return to the example where we were using **Dosage** to predict **Drug Effectiveness**
+
+![alt text](image-108.png)
+
+only this time, we have a few missing values.
+
+![alt text](image-109.png)
+
+Even though we have missing values, we can calculate the **residuals**, the difference between the **observed Drug Effectiveness** and the **Predicted Drug Effectiveness**, using the initial prediction, 0.5.
+
+And just like we normally do when we build **XGBoost Trees**, we can put all of the **Residuals** into a single leaf
+
+![alt text](image-110.png)
+
+Now we need to determine if splitting the **Residuals** into two leaves will do a better job clustering them. So, just like we always do for continuous data, we need to sort the **Dosages** from low to high
+
+![alt text](image-111.png)
+
+Unfortunately, it's unclear how to sort the **Dosages** with missing values. So what we will do is we split the data into two tables. One table will contain all of the obsercations with **Dosage** values and another table will contain all of the observations without **Dosags* values.
+
+![alt text](image-112.png)
+
+Now, focusing on the table that has **Dosage** values for every observation, we sort rwos by **Dosage**, from low to high and we test the average of the first two dosages, 7.5, as a candidate threshold.
+
+![alt text](image-113.png)
+
+> Note: if this was a large dataset, we would be using the first quantile here.
+
+![alt text](image-115.png)
+
+In this case, we test the threshold by putting the **Residual** for the one observation that has a **Dosage < 7.5** in the leaf on the left and putting the remaining **Residuals**, which all have **Dosages > 7.5**, into the leaf on the right.
+
+Now that we have all of the **Residuals** with known **Dosages** in the tree, we calculate the two separate **Gain** values.
+
+![alt text](image-114.png)
+
+The first **Gain** value, which we will call **$Gain_\text{left}$**, is calculated by putting all of the **Residuals** with missing **Dosage** values into the leaf on the left.
+
+![alt text](image-116.png)
+
+The second **Gain** value, which we will call **$Gain_\text{right}$**, is calculated by putting all of the **Residuals** with missing **Dosage** values into the leaf on the right.
+
+![alt text](image-117.png)
+
+Now we do the same thing using average of the next two dosages, **15.5**, as a candidate threshold.
+
+![alt text](image-118.png)
+
+We put the **Residuals** with **Dosages < 15.5** in the leaf on the left and the **Residuals** with **Dosages >= 15.5** in the leaf on the right. 
+
+![alt text](image-119.png)
+
+and then we put all of the **Residuals** with missing **Dosages** into the leaf on the left and calculate **$Gain_\text{left}$**.
+
+![alt text](image-120.png)
+
+Then we put all of the residuals with missing **Dosage** values into the leaf on the right and calculate **$Gain_\text{right}$**.
+
+![alt text](image-121.png)
+
+Lastly, we do the same thing using the average of the last two dosages,23, as a candidate threshold.
+
+![alt text](image-122.png)
+
+We calculate **$Gain_\text{left}$** 
+
+![alt text](image-123.png)
+
+and we calculate **$Gain_\text{right}$**
+
+In the end, we choose the threshold that gaves us the largest value for **Gain** overall.
+
+![alt text](image-124.png)
+
+In this case, that meant picking **$Gain_\text{left}$** when the threshold was **Dosage < 15.5**
+
+> Note: This path, going to the left leaf when **Dosage < 15.5**, will be the default path for all future observations that are missing **Dosage** values
+
+![alt text](image-125.png)
+
+![alt text](image-126.png)
+
+For example, if this was the **XGBoost model** and we got a new obsesrvation without a value for **Dosage**, but without a value for **Dosage**, but we still needed to predict **Drug Effectiveness** then we would assume that this **Observation** goes to the leaf on the left. 
+
+Thus, **Sparsity-Aware Split Finding** tells us how to build trees with missing data and how to deal with new observations when there is missing data.
+
+## Cache-Aware Access
+
+Now we need to talk about **Cache-Aware Access**. This is where **XGBoost** starts to get super nitty gritty.
+
+![alt text](image-128.png)
+
+The basic idea is inside each computer is we have a **CPU(central processing unit)** and that **CPU** has a small amout of **Cache Memory**. 
+
+The **CPU** can use this memory in the computer. The **CPU** is also attached to a large amount of **Main Memory**. While the **Main Memory** is larger than the **Cache**, it takes longer to use.
+
+Lastly, the **CPU** is also attached to the **Hard Drive**. The **Hard Drive** can store the most stuff, but is the slowest of all memory options.
+
+If you want your program to run really fast, the goal is to maximize what you can do with the **Cache Memory**.
+
+So **XGBoost** puts the **Gradients** and **Hessians** in the **Cache** so that it can rapidly calculate **Similarity Scores** and **Output Values**
+
+## Blocks for Out-of-Core Computation
+
+Lastly, we need to talk about **Blocks for Out-of-Core Computation**.
+
+![alt text](image-127.png)
+
+Going back to the super simple computer schematic. When the dataset is too large for the **Cache** and **Main Memory**, then, at least some of it must be stored on the **Hard Drive**.
+
+Because reading and writing data to the **Hard Drive** is super slow, **XGBoost** tries to minimize these actions by compressing the data.
+
+Even though the **CPU** must spend some time decompressing the data that comes from  the **Hard Drive**, it can do this faster than the **Hard Drive** can read the data.
+
+In other words, by spending a little bit of **CPU** time uncompressing the data, we can avoid spending a lot of time accessing the **Hard Drive**. 
+
+Also, when there is more than one **Hard Drive** available for storage, **XGBoost** uses a database technique called **Sharding** to speed up disk access.
+
+![alt text](image-130.png)
+
+For example, if this is the dataset and it is very large then **XGBoost** spilts the data so that each drive gets a unique set of records. 
+
+Then, when the **CPU** needs data, both **Drives** can be reading data at the same time.
+
+Thus, **Cache-Aware Access** and **Blocks for Out-of-Core Computation** are optimizations that take the computer hardware into account
+
+---
+
+![alt text](image-129.png)
+
+Lastly, I need to mention that **XGBoost** can also speed things up by allowing you to build each tree with onnly a random subset of the data.
+
+![alt text](image-131.png)
+
+And **XGBoost** can speed up building trees by only looking at a random subset of features when deciding how to plot the data.
