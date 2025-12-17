@@ -154,6 +154,50 @@ And because the **sum of the squared residuals** are linked to b3 by the **predi
 
 ![alt text](image-75.png)
 
-The chain rule says that the derivative of the sum of the squared residuals with respect to b3 is the derivative of the sum of the squared residuals with respect to the predicted values, times the derivative of the predicted values with respect to $b_3$. 
+The chain rule says that the derivative of the sum of the squared residuals with respect to $b_3$ is the derivative of the sum of the squared residuals with respect to the predicted values, times the derivative of the predicted values with respect to $b_3$. 
 
-Now, before we calculate the derivative of the sum of the squared residuals with respect to the predicted values, let's clean up our workspace and move these equations out of the way. Now we can solve for the derivative of the sum of the squared residuals with respect to the predicted values by first substituting in the equation, and then use the chain rule to move the square to the front, and then we multiply that by the derivative of the stuff inside the parentheses with respect to the predicted values, negative one. Now we simplify by multiplying two by negative 1, and we have the derivative of the sum of the squared residuals with respect to the predicted values. So let's move that up here, and now we are done with the first part. Now let's solve for the second part: the derivative of the predicted values with respect to b3. We start by plugging in the equation for the predicted values. Remember, the blue and orange curves were created before we got to b3. So the derivative of the blue curve with respect to b3 is 0, because the blue curve is independent of b3. And the derivative of the orange curve with respect to b3 is also 0. Lastly, the derivative of b3, with respect to b3, is 1. Now we just add everything up, and the derivative of the predicted values with respect to b3, is one. So we multiply the derivative of the sum of the squared residuals with respect to the predicted values by 1. Note: this times 1 part in the equation doesn't do anything, but I'm leaving it in to remind us that the derivative of the sum of the squared residuals with respect to b3 consists of two parts: the derivative of the sum of the squared residuals with respect to the predicted values, and the derivative of the predicted values with respect to b3. Bam! And at long last we have the derivative of the sum of the squared residuals with respect to b3. And that means we can plug this derivative into gradient descent to find the optimal value for b3. So let's move this equation up and show how we can use this equation with gradient descent. Note: if you're not familiar with gradient descent, check out the quest the link is in the description below. Anyway, first, we expand the summation. Then, we plug in the observed values and the values predicted by the green squiggle. Remember, we get the predicted values on the green squiggle by running the dosages through the neural network. Now, we just do the math and get negative 15.7. And that corresponds to the slope for when b3 equals zero. Now we plug the slope into the gradient descent equation for step size, and, in this example, we'll set the learning rate to 0.1. And that means the step size is -1.57. Now we use the step size to calculate the new value for b3 by plugging in the current value for b3, zero, and the step size, -1.57. And the new value for b3 is 1.57. Changing b3 to 1.57 shifts the green squiggle up, and that shrinks the residuals. Now, plugging in the new predicted values and doing the math gives us -6.26, which corresponds to the slope when b3 equals 1.57. Then, we calculate the step size and the new value for b3, which is 2.19. Changing b3 to 2.19 shifts the green squiggle up further, and that shrinks the residuals even more. Now we just keep taking steps until the step size is close to zero. And because the step size is close to 0 when b3 equals 2.61, we decide that 2.61 is the optimal value for b3. Double bam! So, the main ideas for backpropagation are that, when a parameter is unknown, like b3, we use the chain rule to calculate the derivative of the sum of the squared residuals with respect to the unknown parameter, which in this case was b3. Then we initialize the unknown parameter with a number, and in this case we set b3 equal to zero, and used gradient descent to optimize the unknown parameter. Triple bam! In the next StatQuest we'll show how these ideas can be used to optimize all of the parameters in a neural network. Now it's time for some shameless self-promotion. If you want to review statistics and machine learning offline, check out the StatQuest study guides at statquest.org. There's something for everyone. Hooray! We've made it to the end of another exciting StatQuest. If you like this StatQuest and want to see more, please subscribe.  And if you want to support StatQuest, consider contributing to my patreon campaign, becoming a channel member, buying one or two of my original songs, or a t-shirt or a hoodie, or just donate the links are in the description below.  Alright, until next time.  Quest on!
+Now we can solve for the derivative of the sum of the squared residuals with respect to the predicted values by first substituting in the equation, and then use the chain rule to move the square to the front, and then we multiply that by the derivative of the stuff inside the parentheses with respect to the predicted values, negative one. Now we simplify by multiplying two by negative 1, and we have the derivative of the sum of the squared residuals with respect to the predicted values. 
+
+$$
+\begin{align*}
+\frac{d\ \text{SSR}}{d\ \text{Predicted}} &= \frac{d}{d\ \text{Predicted}} \sum^{n=3}_{i=1} (\text{Observed}_i - \text{Predicted}_i)^2 \\
+&= \sum^{n=3}_{i=1} 2\times(\text{Observed}_i - \text{Predicted}_i) \times -1 \\
+&= \sum^{n=3}_{i=1} -2\times(\text{Observed}_i - \text{Predicted}_i)\\
+\end{align*}
+$$ 
+
+![alt text](image-76.png)
+
+So let's move that up here, and now we are done with the first part.
+
+$$
+\begin{align*}
+\frac{d\ \text{Predicted}}{d\ b_3} &= \frac{d}{d\ b_3} \text{green squiggle} \\
+&= \frac{d}{d\ b_3} (\text{blue} + \text{orange} + b_3 )\\
+&= 0 + 0 + 1 \\
+&=1
+\end{align*}
+$$ 
+
+ Now let's solve for the second part: the derivative of the predicted values with respect to $b_3$. We start by plugging in the equation for the predicted values.**Remember, the blue and orange curves were created before we got to $b_3$.** 
+ 
+ So the derivative of the **blue curve** with respect to $b_3$ is 0, because the blue curve is independent of $b_3$. And the derivative of the **orange curve** with respect to b3 is also 0. Lastly, the derivative of b3, with respect to $b_3$, is 1. Now we just add everything up, and the derivative of the predicted values with respect to $b_3$, is 1. 
+ 
+ ![alt text](image-77.png)
+ 
+ So we multiply the derivative of the sum of the squared residuals with respect to the predicted values by 1.
+ 
+>Note: this times 1 part in the equation doesn't do anything, but I'm leaving it in to remind us that the derivative of the sum of the squared residuals with respect to $b3$ consists of two parts: 
+> - the derivative of the sum of the squared residuals with respect to the predicted values
+> - the derivative of the predicted values with respect to $b_3$.
+
+And at long last we have the derivative of the sum of the squared residuals with respect to $b_3$. And that means we can plug this derivative into **gradient descent** to find the optimal value for $b_3$. 
+
+## Using Gradient Descent
+
+![alt text](image-78.png)
+
+So let's move this equation up and show how we can use this equation with gradient descent. 
+
+
+First, we expand the summation. Then, we plug in the observed values and the values predicted by the green squiggle. Remember, we get the predicted values on the green squiggle by running the dosages through the neural network. Now, we just do the math and get negative 15.7. And that corresponds to the slope for when b3 equals zero. Now we plug the slope into the gradient descent equation for step size, and, in this example, we'll set the learning rate to 0.1. And that means the step size is -1.57. Now we use the step size to calculate the new value for b3 by plugging in the current value for b3, zero, and the step size, -1.57. And the new value for b3 is 1.57. Changing b3 to 1.57 shifts the green squiggle up, and that shrinks the residuals. Now, plugging in the new predicted values and doing the math gives us -6.26, which corresponds to the slope when b3 equals 1.57. Then, we calculate the step size and the new value for b3, which is 2.19. Changing b3 to 2.19 shifts the green squiggle up further, and that shrinks the residuals even more. Now we just keep taking steps until the step size is close to zero. And because the step size is close to 0 when b3 equals 2.61, we decide that 2.61 is the optimal value for b3. Double bam! So, the main ideas for backpropagation are that, when a parameter is unknown, like b3, we use the chain rule to calculate the derivative of the sum of the squared residuals with respect to the unknown parameter, which in this case was b3. Then we initialize the unknown parameter with a number, and in this case we set b3 equal to zero, and used gradient descent to optimize the unknown parameter. Triple bam! In the next StatQuest we'll show how these ideas can be used to optimize all of the parameters in a neural network. Now it's time for some shameless self-promotion. If you want to review statistics and machine learning offline, check out the StatQuest study guides at statquest.org. There's something for everyone. Hooray! We've made it to the end of another exciting StatQuest. If you like this StatQuest and want to see more, please subscribe.  And if you want to support StatQuest, consider contributing to my patreon campaign, becoming a channel member, buying one or two of my original songs, or a t-shirt or a hoodie, or just donate the links are in the description below.  Alright, until next time.  Quest on!
